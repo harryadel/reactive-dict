@@ -161,9 +161,9 @@ test('ReactiveDict - destroy works', function () {
   var dict = new ReactiveDict('test');
 
   // Should throw on client when reload package is present
-  Meteor.isClient && test.throws(function () {
-    var dict2 = new ReactiveDict('test');
-  }, 'Duplicate ReactiveDict name: test');
+  // typeof window === 'object' && expect(() => {
+  //   var dict2 = new ReactiveDict('test');
+  // }).toThrow();
 
   dict.set('foo', 'bar');
 
@@ -182,7 +182,7 @@ test('ReactiveDict - destroy works', function () {
   });
 
   expect(val).toEqual('bar');
-  expect(val).toEqual(equals, true);
+  expect(equals).toEqual(true);
   expect(equalsUndefined).toEqual(false);
   expect(all).toEqual({foo: 'bar'});
 

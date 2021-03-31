@@ -50,8 +50,8 @@ export class ReactiveDict {
         // Only run migration logic on client, it will cause
         // duplicate name errors on server during reloads.
         // _registerDictForMigrate will throw an error on duplicate name.
-        typeof window !== 'undefined' && ReactiveDict._registerDictForMigrate(dictName, this);
-        const migratedData = typeof window !== 'undefined' && ReactiveDict._loadMigratedDict(dictName);
+        typeof window !== 'undefined' && this._registerDictForMigrate(dictName, this);
+        const migratedData = typeof window !== 'undefined' && this._loadMigratedDict(dictName);
 
         if (migratedData) {
           // Don't stringify migrated data
@@ -295,8 +295,8 @@ export class ReactiveDict {
    */
   destroy() {
     this.clear();
-    if (this.name && hasOwn.call(ReactiveDict._dictsToMigrate, this.name)) {
-      delete ReactiveDict._dictsToMigrate[this.name];
+    if (this.name && hasOwn.call(this._dictsToMigrate, this.name)) {
+      delete this._dictsToMigrate[this.name];
     }
   }
 
@@ -327,9 +327,9 @@ export class ReactiveDict {
   }
 
   _loadMigratedDict(dictName) {
-    if (hasOwn.call(ReactiveDict._migratedDictData, dictName)) {
-      const data = ReactiveDict._migratedDictData[dictName];
-      delete ReactiveDict._migratedDictData[dictName];
+    if (hasOwn.call(this._migratedDictData, dictName)) {
+      const data = this._migratedDictData[dictName];
+      delete this._migratedDictData[dictName];
       return data;
     }
 
@@ -337,9 +337,9 @@ export class ReactiveDict {
   };
 
   _registerDictForMigrate(dictName, dict) {
-    if (hasOwn.call(ReactiveDict._dictsToMigrate, dictName))
+    if (hasOwn.call(this._dictsToMigrate, dictName))
       throw new Error("Duplicate ReactiveDict name: " + dictName);
 
-    ReactiveDict._dictsToMigrate[dictName] = dict;
+    this._dictsToMigrate[dictName] = dict;
   };
 }
