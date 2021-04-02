@@ -2,7 +2,7 @@
   "name": "reactive-dict",
   "version": "1.0.0",
   "description": "[Source code of released version](https://github.com/meteor/meteor/tree/master/packages/reactive-dict) | [Source code of development version](https://github.com/meteor/meteor/tree/devel/packages/reactive-dict) ***",
-  "main": "src/reactive-dict.js",
+  "main": "./lib/index.js",
   "scripts": {
     "test": "jest --runInBand --detectOpenHandles --forceExit __tests__/*",
     "clean": "rimraf lib",
@@ -10,8 +10,12 @@
     "build": "cross-env BABEL_ENV=production babel src --out-dir lib",
     "prepublish": "npm run clean && npm run lint && npm run test && npm run build"
   },
-  "author": "",
-  "license": "ISC",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "author": "Harry Adel <harryadelb@gmail.com>",
+  "license": "MIT",
   "dependencies": {
     "bson": "^4.2.3",
     "ejson": "^2.2.1",
@@ -24,6 +28,7 @@
     "cross-env": "^7.0.3",
     "eslint": "^7.23.0",
     "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1",
     "jest": "^26.6.3",
     "rimraf": "^3.0.2"
   }
