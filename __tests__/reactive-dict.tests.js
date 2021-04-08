@@ -1,67 +1,77 @@
 import { Tracker } from 'standalone-tracker';
-const { ReactiveDict } = require('../src/reactive-dict')
 
-test('ReactiveDict - set to undefined', function () {
-  var dict = new ReactiveDict;
+const { ReactiveDict } = require('../src/reactive-dict');
+
+test('ReactiveDict - set to undefined', () => {
+  const dict = new ReactiveDict();
   dict.set('foo', undefined);
   expect(Object.keys(dict.all())).toEqual(['foo']);
   dict.setDefault('foo', 'bar');
   expect(dict.get('foo')).toEqual(undefined);
 });
 
-test('ReactiveDict - initialize with data', function () {
-  var now = new Date();
-  var dict = new ReactiveDict({
-    now: now
+test('ReactiveDict - initialize with data', () => {
+  const now = new Date();
+  let dict = new ReactiveDict({
+    now,
   });
 
-  var nowFromDict = dict.get('now');
+  let nowFromDict = dict.get('now');
   expect(nowFromDict).toEqual(now);
 
   // Test with static value here as a named dict could
   // be migrated if code reload happens while testing
   dict = new ReactiveDict('foo', {
-    foo: 'bar'
+    foo: 'bar',
   });
 
   nowFromDict = dict.get('foo');
   expect(nowFromDict).toEqual('bar');
 
   dict = new ReactiveDict(undefined, {
-    now: now
+    now,
   });
 
   nowFromDict = dict.get('now');
   expect(nowFromDict).toEqual(now);
 });
 
-test('ReactiveDict - setDefault', function () {
-  var dict = new ReactiveDict;
+test('ReactiveDict - setDefault', () => {
+  let dict = new ReactiveDict();
   dict.set('A', 'blah');
   dict.set('B', undefined);
   dict.setDefault('A', 'default');
   dict.setDefault('B', 'default');
   dict.setDefault('C', 'default');
   dict.setDefault('D', undefined);
-  expect(dict.all()).toEqual({A: 'blah', B: undefined,
-                          C: 'default', D: undefined});
+  expect(dict.all()).toEqual({
+    A: 'blah',
+    B: undefined,
+    C: 'default',
+    D: undefined,
+  });
 
-  dict = new ReactiveDict;
+  dict = new ReactiveDict();
   dict.set('A', 'blah');
   dict.set('B', undefined);
   dict.setDefault({
     A: 'default',
     B: 'defualt',
     C: 'default',
-    D: undefined
+    D: undefined,
   });
-  expect(dict.all()).toEqual({A: 'blah', B: undefined,
-                          C: 'default', D: undefined});
+  expect(dict.all()).toEqual({
+    A: 'blah',
+    B: undefined,
+    C: 'default',
+    D: undefined,
+  });
 });
 
-test('ReactiveDict - all() works', function () {
-  var all = {}, dict = new ReactiveDict;
-  Tracker.autorun(function() {
+test('ReactiveDict - all() works', () => {
+  let all = {};
+  const dict = new ReactiveDict();
+  Tracker.autorun(() => {
     all = dict.all();
   });
 
@@ -69,16 +79,15 @@ test('ReactiveDict - all() works', function () {
 
   dict.set('foo', 'bar');
   Tracker.flush();
-  expect(all).toEqual({foo: 'bar'});
+  expect(all).toEqual({ foo: 'bar' });
 
   dict.set('blah', undefined);
   Tracker.flush();
-  expect(all).toEqual({foo: 'bar', blah: undefined});
+  expect(all).toEqual({ foo: 'bar', blah: undefined });
 });
 
-
-test('ReactiveDict - clear() works', function () {
-  var dict = new ReactiveDict;
+test('ReactiveDict - clear() works', () => {
+  const dict = new ReactiveDict();
   dict.set('foo', 'bar');
 
   // Clear should not throw an error now
@@ -87,24 +96,27 @@ test('ReactiveDict - clear() works', function () {
 
   dict.set('foo', 'bar');
 
-  var val, equals, equalsUndefined, all;
-  Tracker.autorun(function() {
+  let val;
+  let equals;
+  let equalsUndefined;
+  let all;
+  Tracker.autorun(() => {
     val = dict.get('foo');
   });
-  Tracker.autorun(function() {
+  Tracker.autorun(() => {
     equals = dict.equals('foo', 'bar');
   });
-  Tracker.autorun(function() {
+  Tracker.autorun(() => {
     equalsUndefined = dict.equals('foo', undefined);
   });
-  Tracker.autorun(function() {
+  Tracker.autorun(() => {
     all = dict.all();
   });
 
   expect(val).toEqual('bar');
   expect(equals).toEqual(true);
   expect(equalsUndefined).toEqual(false);
-  expect(all).toEqual({foo: 'bar'});
+  expect(all).toEqual({ foo: 'bar' });
 
   dict.clear();
   Tracker.flush();
@@ -114,8 +126,8 @@ test('ReactiveDict - clear() works', function () {
   expect(all).toEqual({});
 });
 
-test('ReactiveDict - delete(key) works', function () {
-  var dict = new ReactiveDict;
+test('ReactiveDict - delete(key) works', () => {
+  const dict = new ReactiveDict();
   dict.set('foo', 'bar');
   dict.set('bar', 'foo');
 
@@ -123,27 +135,30 @@ test('ReactiveDict - delete(key) works', function () {
   expect(dict.delete('baz')).toEqual(true);
   expect(dict.delete('baz')).toEqual(false);
 
-  var val, equals, equalsUndefined, all;
+  let val;
+  let equals;
+  let equalsUndefined;
+  let all;
 
-  Tracker.autorun(function() {
+  Tracker.autorun(() => {
     val = dict.get('foo');
   });
-  Tracker.autorun(function() {
+  Tracker.autorun(() => {
     equals = dict.equals('foo', 'bar');
   });
-  Tracker.autorun(function() {
+  Tracker.autorun(() => {
     equalsUndefined = dict.equals('foo', undefined);
   });
-  Tracker.autorun(function() {
+  Tracker.autorun(() => {
     all = dict.all();
   });
 
   expect(val).toEqual('bar');
   expect(equals).toEqual(true);
   expect(equalsUndefined).toEqual(false);
-  expect(all).toEqual({foo: 'bar', bar: 'foo'});
+  expect(all).toEqual({ foo: 'bar', bar: 'foo' });
 
-  var didRemove = dict.delete('foo');
+  let didRemove = dict.delete('foo');
   expect(didRemove).toEqual(true);
 
   Tracker.flush();
@@ -151,14 +166,14 @@ test('ReactiveDict - delete(key) works', function () {
   expect(val).toBeUndefined();
   expect(equals).toEqual(false);
   expect(equalsUndefined).toEqual(true);
-  expect(all).toEqual({bar: 'foo'});
+  expect(all).toEqual({ bar: 'foo' });
 
   didRemove = dict.delete('barfoobar');
   expect(didRemove).toEqual(false);
 });
 
-test('ReactiveDict - destroy works', function () {
-  var dict = new ReactiveDict('test');
+test('ReactiveDict - destroy works', () => {
+  let dict = new ReactiveDict('test');
 
   // Should throw on client when reload package is present
   // typeof window === 'object' && expect(() => {
@@ -167,24 +182,27 @@ test('ReactiveDict - destroy works', function () {
 
   dict.set('foo', 'bar');
 
-  var val, equals, equalsUndefined, all;
-  Tracker.autorun(function() {
+  let val;
+  let equals;
+  let equalsUndefined;
+  let all;
+  Tracker.autorun(() => {
     val = dict.get('foo');
   });
-  Tracker.autorun(function() {
+  Tracker.autorun(() => {
     equals = dict.equals('foo', 'bar');
   });
-  Tracker.autorun(function() {
+  Tracker.autorun(() => {
     equalsUndefined = dict.equals('foo', undefined);
   });
-  Tracker.autorun(function() {
+  Tracker.autorun(() => {
     all = dict.all();
   });
 
   expect(val).toEqual('bar');
   expect(equals).toEqual(true);
   expect(equalsUndefined).toEqual(false);
-  expect(all).toEqual({foo: 'bar'});
+  expect(all).toEqual({ foo: 'bar' });
 
   // .destroy() should clear the dict
   dict.destroy();
