@@ -36,7 +36,8 @@ function changed(v) {
  *  preserves contents across Hot Code Pushes
  * @param {Object} [initialValue] Optional.  The default values for the dictionary
  */
-export default class ReactiveDict {
+// eslint-disable-next-line import/prefer-default-export
+export class ReactiveDict {
   constructor(dictName, dictData) {
     // this.keys: key -> value
     this.keys = {};
