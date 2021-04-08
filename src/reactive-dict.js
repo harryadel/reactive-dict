@@ -1,5 +1,6 @@
+/* eslint-disable no-underscore-dangle */
 import { Tracker } from 'standalone-tracker';
-import EJSON from 'ejson'
+import EJSON from 'ejson';
 import { ObjectId } from 'bson';
 
 const hasOwn = Object.prototype.hasOwnProperty;
@@ -21,26 +22,27 @@ function parse(serialized) {
 }
 
 function changed(v) {
-  v && v.changed();
+  return v && v.changed();
 }
 
 // XXX COMPAT WITH 0.9.1 : accept migrationData instead of dictName
 /**
  * @class
  * @instanceName ReactiveDict
- * @summary Constructor for a ReactiveDict, which represents a reactive dictionary of key/value pairs.
+ * @summary Constructor for a ReactiveDict,
+ *  which represents a reactive dictionary of key/value pairs.
  * @locus Client
- * @param {String} [name] Optional.  When a name is passed, preserves contents across Hot Code Pushes
+ * @param {String} [name] Optional.  When a name is passed,
+ *  preserves contents across Hot Code Pushes
  * @param {Object} [initialValue] Optional.  The default values for the dictionary
  */
-export class ReactiveDict {
+export default class ReactiveDict {
   constructor(dictName, dictData) {
     // this.keys: key -> value
     this.keys = {};
 
     this._migratedDictData = {}; // name -> data
     this._dictsToMigrate = {}; // name -> ReactiveDict
-
 
     if (dictName) {
       // name given; migration will be performed
@@ -50,7 +52,7 @@ export class ReactiveDict {
         // Only run migration logic on client, it will cause
         // duplicate name errors on server during reloads.
         // _registerDictForMigrate will throw an error on duplicate name.
-        typeof window !== 'undefined' && this._registerDictForMigrate(dictName, this);
+        if (typeof window !== 'undefined') { this._registerDictForMigrate(dictName, this); }
         const migratedData = typeof window !== 'undefined' && this._loadMigratedDict(dictName);
 
         if (migratedData) {
@@ -66,13 +68,13 @@ export class ReactiveDict {
         // Use _setObject to make sure values are stringified
         this._setObject(dictName);
       } else {
-        throw new Error("Invalid ReactiveDict argument: " + dictName);
+        throw new Error(`Invalid ReactiveDict argument: ${dictName}`);
       }
     } else if (typeof dictData === 'object') {
       this._setObject(dictData);
     }
 
-    this.allDeps = new Tracker.Dependency;
+    this.allDeps = new Tracker.Dependency();
     this.keyDeps = {}; // key -> Dependency
     this.keyValueDeps = {}; // key -> Dependency
   }
@@ -99,13 +101,13 @@ export class ReactiveDict {
     // and we resume with the rest of the function
     const key = keyOrObject;
 
-    value = stringify(value);
+    const stringifiedValue = stringify(value);
 
     const keyExisted = hasOwn.call(this.keys, key);
     const oldSerializedValue = keyExisted ? this.keys[key] : 'undefined';
-    const isNewValue = (value !== oldSerializedValue);
+    const isNewValue = (stringifiedValue !== oldSerializedValue);
 
-    this.keys[key] = value;
+    this.keys[key] = stringifiedValue;
 
     if (isNewValue || !keyExisted) {
       // Using the changed utility function here because this.allDeps might not exist yet,
@@ -119,7 +121,7 @@ export class ReactiveDict {
       changed(this.keyDeps[key]);
       if (this.keyValueDeps[key]) {
         changed(this.keyValueDeps[key][oldSerializedValue]);
-        changed(this.keyValueDeps[key][value]);
+        changed(this.keyValueDeps[key][stringifiedValue]);
       }
     }
   }
@@ -182,14 +184,14 @@ export class ReactiveDict {
     //
     // XXX we could allow arrays as long as we recursively check that there
     // are no objects
-    if (typeof value !== 'string' &&
-      typeof value !== 'number' &&
-      typeof value !== 'boolean' &&
-      typeof value !== 'undefined' &&
-      !(value instanceof Date) &&
-      !(value instanceof ObjectId) &&
-      value !== null) {
-      throw new Error("ReactiveDict.equals: value must be scalar");
+    if (typeof value !== 'string'
+      && typeof value !== 'number'
+      && typeof value !== 'boolean'
+      && typeof value !== 'undefined'
+      && !(value instanceof Date)
+      && !(value instanceof ObjectId)
+      && value !== null) {
+      throw new Error('ReactiveDict.equals: value must be scalar');
     }
     const serializedValue = stringify(value);
 
@@ -197,10 +199,10 @@ export class ReactiveDict {
       this._ensureKey(key);
 
       if (!hasOwn.call(this.keyValueDeps[key], serializedValue)) {
-        this.keyValueDeps[key][serializedValue] = new Tracker.Dependency;
+        this.keyValueDeps[key][serializedValue] = new Tracker.Dependency();
       }
 
-      var isNew = this.keyValueDeps[key][serializedValue].depend();
+      const isNew = this.keyValueDeps[key][serializedValue].depend();
       if (isNew) {
         Tracker.onInvalidate(() => {
           // clean up [key][serializedValue] if it's now empty, so we don't
@@ -212,7 +214,7 @@ export class ReactiveDict {
       }
     }
 
-    let oldValue = undefined;
+    let oldValue;
     if (hasOwn.call(this.keys, key)) {
       oldValue = parse(this.keys[key]);
     }
@@ -231,8 +233,8 @@ export class ReactiveDict {
    */
   all() {
     this.allDeps.depend();
-    let ret = {};
-    Object.keys(this.keys).forEach(key => {
+    const ret = {};
+    Object.keys(this.keys).forEach((key) => {
       ret[key] = parse(this.keys[key]);
     });
     return ret;
@@ -251,11 +253,11 @@ export class ReactiveDict {
 
     this.allDeps.changed();
 
-    Object.keys(oldKeys).forEach(key => {
+    Object.keys(oldKeys).forEach((key) => {
       changed(this.keyDeps[key]);
       if (this.keyValueDeps[key]) {
         changed(this.keyValueDeps[key][oldKeys[key]]);
-        changed(this.keyValueDeps[key]['undefined']);
+        changed(this.keyValueDeps[key].undefined);
       }
     });
   }
@@ -277,7 +279,7 @@ export class ReactiveDict {
       changed(this.keyDeps[key]);
       if (this.keyValueDeps[key]) {
         changed(this.keyValueDeps[key][oldValue]);
-        changed(this.keyValueDeps[key]['undefined']);
+        changed(this.keyValueDeps[key].undefined);
       }
       this.allDeps.changed();
       didRemove = true;
@@ -301,20 +303,20 @@ export class ReactiveDict {
   }
 
   _setObject(object) {
-    Object.keys(object).forEach(key => {
+    Object.keys(object).forEach((key) => {
       this.set(key, object[key]);
     });
   }
 
   _setDefaultObject(object) {
-    Object.keys(object).forEach(key => {
+    Object.keys(object).forEach((key) => {
       this.setDefault(key, object[key]);
     });
   }
 
   _ensureKey(key) {
     if (!(key in this.keyDeps)) {
-      this.keyDeps[key] = new Tracker.Dependency;
+      this.keyDeps[key] = new Tracker.Dependency();
       this.keyValueDeps[key] = {};
     }
   }
@@ -334,12 +336,11 @@ export class ReactiveDict {
     }
 
     return null;
-  };
+  }
 
   _registerDictForMigrate(dictName, dict) {
-    if (hasOwn.call(this._dictsToMigrate, dictName))
-      throw new Error("Duplicate ReactiveDict name: " + dictName);
+    if (hasOwn.call(this._dictsToMigrate, dictName)) { throw new Error(`Duplicate ReactiveDict name: ${dictName}`); }
 
     this._dictsToMigrate[dictName] = dict;
-  };
+  }
 }
