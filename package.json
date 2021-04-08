@@ -2,7 +2,7 @@
   "name": "reactive-dict",
   "version": "1.0.0",
   "description": "[Source code of released version](https://github.com/meteor/meteor/tree/master/packages/reactive-dict) | [Source code of development version](https://github.com/meteor/meteor/tree/devel/packages/reactive-dict) ***",
-  "main": "./lib/index.js",
+  "main": "./lib/reactive-dict.js",
   "scripts": {
     "test": "jest --runInBand --detectOpenHandles --forceExit __tests__/*",
     "clean": "rimraf lib",
