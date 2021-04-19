@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
-const { Tracker } = require('standalone-tracker');
-const EJSON = require('ejson');
-const { ObjectId } = require('bson');
+import { Tracker } from 'standalone-tracker';
+import EJSON from 'ejson';
+import { ObjectId } from 'bson';
 
 const hasOwn = Object.prototype.hasOwnProperty;
 
