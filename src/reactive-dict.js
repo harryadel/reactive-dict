@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { Tracker } from 'standalone-tracker';
 import EJSON from 'ejson';
-import { ObjectId } from 'bson';
+import MongoID from './mongoId';
 
 const hasOwn = Object.prototype.hasOwnProperty;
 
@@ -190,7 +190,7 @@ export class ReactiveDict {
       && typeof value !== 'boolean'
       && typeof value !== 'undefined'
       && !(value instanceof Date)
-      && !(value instanceof ObjectId)
+      && !(value instanceof MongoID.ObjectID)
       && value !== null) {
       throw new Error('ReactiveDict.equals: value must be scalar');
     }
