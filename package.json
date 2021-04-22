@@ -17,7 +17,6 @@
   "author": "Harry Adel <harryadelb@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "bson": "^4.3.0",
     "ejson": "^2.2.1",
     "standalone-tracker": "^1.0.0"
   },
