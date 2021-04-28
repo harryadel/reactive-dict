@@ -1,4 +1,6 @@
 /* eslint-disable no-underscore-dangle */
+import Random from '@reactioncommerce/random';
+
 const MongoID = {};
 
 MongoID._looksLikeObjectID = (str) => str.length === 24 && str.match(/^[0-9a-f]*$/);
@@ -31,6 +33,7 @@ MongoID.ObjectID = class ObjectID {
     return new MongoID.ObjectID(this._str);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   typeName() {
     return 'oid';
   }
